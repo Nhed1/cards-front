@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
-import { signIn } from "./actions/auth";
 
 export const SignInTab = () => {
   return (
@@ -20,7 +19,7 @@ export const SignInTab = () => {
           <CardTitle>Entrar</CardTitle>
           <CardDescription>Preencha suas credenciais</CardDescription>
         </CardHeader>
-        <form action={signIn}>
+        <form>
           <CardContent className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
