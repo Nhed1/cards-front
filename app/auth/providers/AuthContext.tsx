@@ -31,7 +31,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const handleRegister = async (email: string, password: string) => {
-    console.log("hello");
     const { token, refreshToken } = await register(email, password);
 
     setToken(token);
