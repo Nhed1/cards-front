@@ -11,36 +11,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
-import { AuthInputs } from "./types";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useAuth } from "./providers/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { AuthInputs, OnSubmit } from "./types";
+import { useFormContext } from "react-hook-form";
 
-export const SignUpTab = () => {
+export const SignUpTab = ({ onSubmit }: { onSubmit: OnSubmit }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<AuthInputs>();
-  const { handleRegister } = useAuth();
-
-  const { toast } = useToast();
-
-  const onSubmit: SubmitHandler<AuthInputs> = async (data) => {
-    try {
-      const value = await handleRegister(data.email, data.password);
-
-      toast({
-        title: "success",
-        variant: "default",
-      });
-    } catch {
-      toast({
-        title: "error",
-        variant: "destructive",
-      });
-    }
-  };
+  } = useFormContext<AuthInputs>();
 
   return (
     <TabsContent value="sign-up">
