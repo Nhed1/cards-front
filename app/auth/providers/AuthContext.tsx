@@ -1,7 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { login, register, getNewToken } from "../api/auth";
+import { login, register, getNewToken, verifyAccessToken } from "../api/auth";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   token: string | null;
@@ -18,25 +19,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
+
+  const goToDashboard = () => router.push("/dashboard");
+
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   const handleLogin = async (email: string, password: string) => {
-    const { token, refreshToken } = await login(email, password);
+    const { accessToken, refreshToken } = await login(email, password);
+
+    if (!accessToken && !refreshToken) throw Error("wrong credentials");
+
     setToken(token);
     setRefreshToken(refreshToken);
 
-    Cookies.set("token", token, { expires: SEVEN_DAYS });
+    goToDashboard();
+
+    Cookies.set("token", accessToken, { expires: SEVEN_DAYS });
     Cookies.set("refreshToken", refreshToken, { expires: SEVEN_DAYS });
   };
 
   const handleRegister = async (email: string, password: string) => {
-    const { token, refreshToken } = await register(email, password);
+    const { accessToken, refreshToken } = await register(email, password);
 
     setToken(token);
     setRefreshToken(refreshToken);
 
-    Cookies.set("token", token, { expires: SEVEN_DAYS });
+    goToDashboard();
+
+    Cookies.set("token", accessToken, { expires: SEVEN_DAYS });
     Cookies.set("refreshToken", refreshToken, { expires: SEVEN_DAYS });
   };
 
@@ -48,19 +60,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const handleAccessToken = async () => {};
+
   const handleLogout = () => {
     setToken(null);
     setRefreshToken(null);
     Cookies.remove("token");
     Cookies.remove("refreshToken");
+    router.push("/auth");
+  };
+
+  const validateAndRedirect = async (token?: string) => {
+    if (token) {
+      try {
+        const { isValid } = await verifyAccessToken(token);
+
+        if (isValid) {
+          goToDashboard();
+        }
+      } catch (err) {
+        console.error("Token validation failed:", err);
+        handleLogout();
+      }
+    } else {
+      handleLogout();
+    }
   };
 
   useEffect(() => {
     const storedToken = Cookies.get("token");
+    validateAndRedirect(storedToken);
     if (storedToken) {
       setToken(storedToken);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   return (
     <AuthContext.Provider

@@ -1,8 +1,9 @@
 import { api } from "@/app/utils/api";
 
 interface LoginResponse {
-  token: string;
+  accessToken: string;
   refreshToken: string;
+  message?: string;
 }
 
 export const login = async (email: string, password: string) => {
@@ -22,5 +23,10 @@ export const register = async (email: string, password: string) => {
 
 export const getNewToken = async (refreshToken: string) => {
   const response = await api.post("/auth/refresh-token", { refreshToken });
+  return response.data;
+};
+
+export const verifyAccessToken = async (accessToken: string) => {
+  const response = await api.post("/auth/validate-token", { accessToken });
   return response.data;
 };

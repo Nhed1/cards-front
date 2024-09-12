@@ -17,9 +17,9 @@ export default function Auth() {
 
   const onSubmit: SubmitHandler<AuthInputs> = async (data) => {
     try {
-      (await isLogin)
-        ? handleLogin(data.email, data.password)
-        : handleRegister(data.email, data.password);
+      isLogin
+        ? await handleLogin(data.email, data.password)
+        : await handleRegister(data.email, data.password);
 
       toast({
         title: "success",
