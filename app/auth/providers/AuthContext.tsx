@@ -10,6 +10,7 @@ interface AuthContextType {
   handleLogin: (email: string, password: string) => Promise<void>;
   handleRegister: (email: string, password: string) => Promise<void>;
   handleRefreshToken: () => Promise<void>;
+  handleLogout: () => void;
 }
 
 const SEVEN_DAYS = 7;
@@ -60,8 +61,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const handleAccessToken = async () => {};
-
   const handleLogout = () => {
     setToken(null);
     setRefreshToken(null);
@@ -104,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshToken,
         token,
         handleRefreshToken,
+        handleLogout,
       }}
     >
       {children}
