@@ -4,6 +4,7 @@ interface LoginResponse {
   accessToken: string;
   refreshToken: string;
   message?: string;
+  user: string;
 }
 
 export const login = async (email: string, password: string) => {
@@ -28,5 +29,10 @@ export const getNewToken = async (refreshToken: string) => {
 
 export const verifyAccessToken = async (accessToken: string) => {
   const response = await api.post("/auth/validate-token", { accessToken });
+  return response.data;
+};
+
+export const fetchUserByToken = async (accessToken: string) => {
+  const response = await api.post("/auth/fetch-user", { accessToken });
   return response.data;
 };

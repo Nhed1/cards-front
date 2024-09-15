@@ -1,6 +1,12 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { login, register, getNewToken, verifyAccessToken } from "../api/auth";
+import {
+  login,
+  register,
+  getNewToken,
+  verifyAccessToken,
+  fetchUserByToken,
+} from "../api/auth";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +16,7 @@ interface AuthContextType {
   handleLogin: (email: string, password: string) => Promise<void>;
   handleRegister: (email: string, password: string) => Promise<void>;
   handleLogout: () => void;
+  userEmail: string | null;
 }
 
 const SEVEN_DAYS = 7;
@@ -21,6 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const goToDashboard = () => router.push("/dashboard");
 
@@ -36,18 +44,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const handleLogin = async (email: string, password: string) => {
-    const { accessToken, refreshToken } = await login(email, password);
+    const { accessToken, refreshToken, user } = await login(email, password);
 
     if (!accessToken && !refreshToken) throw Error("wrong credentials");
 
     getAuthenticated(accessToken, refreshToken);
+    setUserEmail(user);
   };
 
   const handleRegister = async (email: string, password: string) => {
-    const { accessToken, refreshToken } = await register(email, password);
+    const { accessToken, refreshToken, user } = await register(email, password);
 
     if (!accessToken && !refreshToken) throw Error("wrong credentials");
 
+    setUserEmail(user);
     getAuthenticated(accessToken, refreshToken);
   };
 
@@ -65,6 +75,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const { isValid } = await verifyAccessToken(token);
 
         if (isValid) {
+          const { user } = await fetchUserByToken(token);
+          setUserEmail(user);
           goToDashboard();
         }
       } catch (err) {
@@ -93,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshToken,
         token,
         handleLogout,
+        userEmail,
       }}
     >
       {children}
