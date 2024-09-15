@@ -25,8 +25,8 @@ export const SignUpTab = ({ onSubmit }: { onSubmit: OnSubmit }) => {
     <TabsContent value="sign-up">
       <Card>
         <CardHeader>
-          <CardTitle>Registrar</CardTitle>
-          <CardDescription>Preencha suas credenciais</CardDescription>
+          <CardTitle>Sign Up</CardTitle>
+          <CardDescription>Fill in your credentials</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-2">
@@ -45,7 +45,7 @@ export const SignUpTab = ({ onSubmit }: { onSubmit: OnSubmit }) => {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 {...register("password", {
                   required: {
@@ -68,7 +68,7 @@ export const SignUpTab = ({ onSubmit }: { onSubmit: OnSubmit }) => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit">Registrar</Button>
+            <Button type="submit">Confirm</Button>
           </CardFooter>
         </form>
       </Card>

@@ -22,14 +22,18 @@ export default function Auth() {
         : await handleRegister(data.email, data.password);
 
       toast({
-        title: "success",
-        variant: "default",
+        title: isLogin ? "Login Successful" : "Registration Successful",
+        description: isLogin
+          ? "You have successfully logged in. Redirecting to the dashboard..."
+          : "Your account has been created. Redirecting to the dashboard...",
+        variant: "success",
       });
 
       methods.reset({ email: "", password: "" });
     } catch {
       toast({
-        title: "error",
+        title: "Error",
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
     }
@@ -41,10 +45,10 @@ export default function Auth() {
         <Tabs defaultValue="sign-in" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="sign-in" onClick={() => setIsLogin(true)}>
-              Entrar
+              Sign In
             </TabsTrigger>
             <TabsTrigger value="sign-up" onClick={() => setIsLogin(false)}>
-              Registrar
+              Sign Up
             </TabsTrigger>
           </TabsList>
           <SignInTab onSubmit={onSubmit} />
