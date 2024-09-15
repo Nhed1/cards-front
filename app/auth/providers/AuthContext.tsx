@@ -9,7 +9,6 @@ interface AuthContextType {
   refreshToken: string | null;
   handleLogin: (email: string, password: string) => Promise<void>;
   handleRegister: (email: string, password: string) => Promise<void>;
-  handleRefreshToken: () => Promise<void>;
   handleLogout: () => void;
 }
 
@@ -27,38 +26,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
+  const getAuthenticated = (accessToken: string, refreshToken: string) => {
+    setToken(token);
+    setRefreshToken(refreshToken);
+
+    goToDashboard();
+    Cookies.set("token", accessToken, { expires: SEVEN_DAYS });
+    Cookies.set("refreshToken", refreshToken, { expires: SEVEN_DAYS });
+  };
+
   const handleLogin = async (email: string, password: string) => {
     const { accessToken, refreshToken } = await login(email, password);
 
     if (!accessToken && !refreshToken) throw Error("wrong credentials");
 
-    setToken(token);
-    setRefreshToken(refreshToken);
-
-    goToDashboard();
-
-    Cookies.set("token", accessToken, { expires: SEVEN_DAYS });
-    Cookies.set("refreshToken", refreshToken, { expires: SEVEN_DAYS });
+    getAuthenticated(accessToken, refreshToken);
   };
 
   const handleRegister = async (email: string, password: string) => {
     const { accessToken, refreshToken } = await register(email, password);
 
-    setToken(token);
-    setRefreshToken(refreshToken);
+    if (!accessToken && !refreshToken) throw Error("wrong credentials");
 
-    goToDashboard();
-
-    Cookies.set("token", accessToken, { expires: SEVEN_DAYS });
-    Cookies.set("refreshToken", refreshToken, { expires: SEVEN_DAYS });
-  };
-
-  const handleRefreshToken = async () => {
-    if (refreshToken) {
-      const { token } = await getNewToken(refreshToken);
-      setToken(token);
-      Cookies.set("token", token, { expires: 7 });
-    }
+    getAuthenticated(accessToken, refreshToken);
   };
 
   const handleLogout = () => {
@@ -102,7 +92,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         handleRegister,
         refreshToken,
         token,
-        handleRefreshToken,
         handleLogout,
       }}
     >
